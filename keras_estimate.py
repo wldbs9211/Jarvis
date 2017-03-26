@@ -39,6 +39,10 @@ EYE_CASCADE_NAME = "./haarcascade_eye_tree_eyeglasses.xml"
 EYE_CASCADE = cv2.CascadeClassifier(EYE_CASCADE_NAME)
 FACE_CASCADE = cv2.CascadeClassifier(FACE_CASCADE_NAME)
 
+# 눈의 상태 상수
+EYE_OPENED = 0
+EYE_CLOSED = 1
+
 # 학습된 모델을 가져온다.
 json_file = open('model.json', 'r')
 loaded_model_json = json_file.read()
@@ -116,9 +120,13 @@ def find_eyes(gray, face):  # 위에서 흑백프레임과 얼굴을 넘겨받�
     #print features
     predit_result = loaded_model.predict(features)
     if(predit_result[0][0] < predit_result[0][1]):
-    	print "eye_open"
+    	#print "eye_open"
+    	eyeStatus = EYE_OPENED
     else:
-    	print "eye_closed"
+    	#print "eye_closed"
+    	eyeStatus = EYE_CLOSED
+
+    printEyeStatus(gray,eyeStatus)
 
     # evaluate loaded model on test data
     #loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
@@ -134,7 +142,7 @@ def ShowEyeRegion(frameOfFace, positionOfEye):
 
 def printEyeStatus(frame, eyeStatus):
     font = cv2.FONT_HERSHEY_SIMPLEX
-    if(eyeStatus == EYE_OPEN):
+    if(eyeStatus == EYE_OPENED):
         cv2.putText(frame,'EYE_OPEN',(50,50), font, 2,(0,0,0),2)
     else:
         cv2.putText(frame,'EYE_CLOSED',(50,50), font, 2,(0,0,0),2)
