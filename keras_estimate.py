@@ -63,7 +63,7 @@ def main():
             cv2.rectangle(gray, (x, y), (x + w, y + h), (255, 0, 0), 1)  # 얼굴에 사각형을 그린다.
 
         if len(faces) > 0:  # 얼굴이 하나 이상 존재한다면 아래 작업을 실행한다.
-            find_eyes(gray, faces[0])   # find_eyes 함수를 호출한다. 아래 함수 참고
+            blinkCheck(gray, faces[0])   # find_eyes 함수를 호출한다. 아래 함수 참고
 
         cv2.imshow("gray", gray)    # 흑백화면 출력
         #cv2.imshow("main", img)     # 컬러화면 출력
@@ -77,7 +77,7 @@ def main():
     cv2.destroyAllWindows()
 
 
-def find_eyes(gray, face):  # 위에서 흑백프레임과 얼굴을 넘겨받음.
+def blinkCheck(gray, face):  # 위에서 흑백프레임과 얼굴을 넘겨받음.
     (x, y, w, h) = face # 얼굴의 위치와 넓이와 높이를 얻는다.
     face_roi = gray[y:y+h, x:x+h]   # 얼굴 부분만 얻어온다.
     
@@ -126,12 +126,8 @@ def find_eyes(gray, face):  # 위에서 흑백프레임과 얼굴을 넘겨받�
     	#print "eye_closed"
     	eyeStatus = EYE_CLOSED
 
-    printEyeStatus(gray,eyeStatus)
+    printEyeStatus(gray,eyeStatus) # 화면에 눈의 개폐 상태를 출력한다.
 
-    # evaluate loaded model on test data
-    #loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-    #score = loaded_model.evaluate(X, Y, verbose=0)
-    #print "%s: %.2f%%" % (loaded_model.metrics_names[1], score[1]*100)
 
 # 입력 : 얼굴프레임과 눈 영역의 위치 정보
 # 동작 : 얼굴 프레임에 눈 위치에 맞게 사각형을 그린다.
@@ -140,6 +136,9 @@ def ShowEyeRegion(frameOfFace, positionOfEye):
     eye_x, eye_y, eye_width, eye_height = positionOfEye
     cv2.rectangle(frameOfFace, (eye_x, eye_y), (eye_x + eye_width, eye_y + eye_height), (255, 0, 0), 1)
 
+# 입력 : 프레임과 눈의 상태
+# 동작 : 눈의 상태를 프레임에 출력한다
+# 리턴 : x
 def printEyeStatus(frame, eyeStatus):
     font = cv2.FONT_HERSHEY_SIMPLEX
     if(eyeStatus == EYE_OPENED):
@@ -147,6 +146,9 @@ def printEyeStatus(frame, eyeStatus):
     else:
         cv2.putText(frame,'EYE_CLOSED',(50,50), font, 2,(0,0,0),2)
 
+# 입력 : 이미지와 resize될 가로, 세로크기
+# 동작 : 이미지를 입력으로 받은 가로 * 세로로 변환 후 vector화 한다.
+# 리턴 : resize 후 vector화된 이미지
 def image_to_feature_vector(image, size=(32, 32)):
 	# resize the image to a fixed size, then flatten the image into
 	# a list of raw pixel intensities
